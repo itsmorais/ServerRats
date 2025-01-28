@@ -1,0 +1,33 @@
+import { UserRepository } from "@/repositories/UserRepository";
+import bcrypt from "bcryptjs";
+
+
+interface CreateUserRequest {
+    name: string;
+    email: string;
+    password: string;
+}
+
+export class CreateUserUseCase {
+    constructor(private userRepository: UserRepository) { }
+
+    async execute({ name, email, password }: CreateUserRequest) {
+
+        const userWithSameEmail = await this.userRepository.findByEmail(email);
+
+        if (userWithSameEmail) {
+            throw new Error("USER ALREADY EXISTS");
+        }
+
+        const hashPassword = await bcrypt.hash(password, 6);
+
+        const user = await this.userRepository.create({
+            name,
+            email,
+            password_hash: hashPassword
+        });
+
+        return user;
+
+    }
+}

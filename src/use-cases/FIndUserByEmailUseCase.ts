@@ -1,4 +1,5 @@
 import { UserRepository } from "@/repositories/UserRepository";
+import { ResourceNotFoundErrorError } from "./errors/ResourceNotFoundError";
 
 export class FindUserByEmailUseCase {
     constructor(private userRepository: UserRepository) { }
@@ -6,7 +7,7 @@ export class FindUserByEmailUseCase {
     async execute(email: string) {
         const user = await this.userRepository.findByEmail(email);
         if (!user) {
-            throw new Error("User not found.");
+            throw new ResourceNotFoundErrorError()
         }
         return user;
     }

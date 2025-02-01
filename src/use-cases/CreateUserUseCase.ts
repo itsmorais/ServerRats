@@ -7,12 +7,13 @@ interface CreateUserRequest {
     name: string;
     email: string;
     password: string;
+    role?: "ADMIN" | "MEMBER"
 }
 
 export class CreateUserUseCase {
     constructor(private userRepository: UserRepository) { }
 
-    async execute({ name, email, password }: CreateUserRequest) {
+    async execute({ name, email, password,role="MEMBER" }: CreateUserRequest) {
 
         const userWithSameEmail = await this.userRepository.findByEmail(email);
 
@@ -25,7 +26,8 @@ export class CreateUserUseCase {
         const user = await this.userRepository.create({
             name,
             email,
-            password_hash: hashPassword
+            password_hash: hashPassword,
+            role
         });
 
         return user;

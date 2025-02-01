@@ -10,13 +10,14 @@ export async function createUser(req: Request, res: Response) {
             name: z.string(),
             email: z.string().email(),
             password: z.string().min(6),
+            role: z.enum(["MEMBER","ADMIN"]).default("MEMBER")
         });
-        const { name, email, password } = registerBodySchema.parse(req.body);
+        const { name, email, password,role } = registerBodySchema.parse(req.body);
         //console.log(name,email,password)
 
         const createUserUseCase = makeCreateUserUseCase()
 
-        const user = await createUserUseCase.execute({ name, email, password });
+        const user = await createUserUseCase.execute({ name, email, password,role });
         return res.status(201).json(user);
 
     } catch (err) {

@@ -1,5 +1,8 @@
 import { app } from "./app";
 import { env } from './env';
 
-app.listen(env.PORT, () => 
+app.listen(env.PORT, () =>
     console.log(`Server is running on Port:${env.PORT}`))
+    .on("error", (err) => {
+        console.error("Error starting server", err)
+    })

@@ -1,11 +1,13 @@
 import { JwtRequest, Router } from "express";
-import { createUser } from "../controllers/users/UserController";
+import { UserController } from "../controllers/users/UserController";
 import { authMiddlware } from "../middlewares/verifyJWT";
 import { roleMiddleware } from "../middlewares/verifyUserRole";
 
 export const userRoutes = Router();
 
-userRoutes.post("/register", createUser);
+const userController = new UserController()
+
+userRoutes.post("/register", userController.create);
 
 // TESTES
 userRoutes.get("/profile", authMiddlware, (req: JwtRequest, res) => {

@@ -17,4 +17,8 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run test
+      - name: 🔧 Set Up Environment Variables
+        run: |
+          echo "JWT_SECRET=my_super_secret_key" >> $GITHUB_ENV
+
+      - run: npm test

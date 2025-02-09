@@ -1,11 +1,27 @@
 version: '3'
-
+# DATABASE - POSTGRESQL
 services:
   api-solid-pg:
     image: bitnami/postgresql
     ports:
-      - 5435:5432
+      - "${POSTGRESQL_LOCALHOST_PORT}:${POSTGRESQL_DEFAULT_PORT}"
+    env_file:
+      - .env      
+
+  # Nodejs Server - PM2
+  api:
+    build: .
+    container_name: api-solid
+    restart: always
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - api-solid-pg
+    env_file:
+      - .env 
     environment:
-      - POSTGRESQL_USERNAME=docker
-      - POSTGRESQL_PASSWORD=docker
-      - POSTGRESQL_DATABASE=apisolid
+      - DOCKER: true
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: ["pm2-runtime", "start", "ecosystem.config.js", "--env", "production"]

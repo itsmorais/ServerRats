@@ -1,5 +1,6 @@
 import { GroupsRepository } from "@/repositories/GroupRepository";
 import { customAlphabet } from 'nanoid'
+import { MembershipRepository } from "@/repositories/PrismaMembershipRepository";
 
 interface CreateGroupRequest {
     name: string;
@@ -11,7 +12,10 @@ interface CreateGroupRequest {
 }
 
 export class CreateGroupUseCase {
-    constructor(private groupRepository: GroupsRepository) { }
+    constructor(private groupRepository: GroupsRepository,
+        private membershipRepository: MembershipRepository
+    ) { }
+
 
     async execute({ name, imageSrc, isPublic, ownerId, startDate, endDate }: CreateGroupRequest) {
         const nanoid = customAlphabet("QPWOEIRUTYALSKDJFHGZMXNCBV0976431285", 8);
@@ -35,6 +39,11 @@ export class CreateGroupUseCase {
                 }
             }
         });
+
+        await this.membershipRepository.create({
+            user: { connect: { id: ownerId } },
+            group: { connect: { id: group.id } }
+        })
 
         return { group };
 

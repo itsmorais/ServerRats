@@ -13,6 +13,8 @@ model User {
   email         String   @unique
   password_hash String
   created_at    DateTime @default(now())
+  groupsMemberships GroupMembership[]
+
 
   ownedGroups Group[] @relation("UserOwnsGroups")
 
@@ -27,11 +29,25 @@ model Group {
   isPublic  Boolean  @default(false)
   owner     User     @relation("UserOwnsGroups", fields: [ownerId], references: [id])
   ownerId   String
+  memberships GroupMembership[]
   startDate DateTime
   endDate   DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("groups")
+}
+
+model GroupMembership{
+  id  Int @id @default(autoincrement())
+  userId  String
+  groupId Int
+  user  User @relation(fields: [userId],references: [id])
+  group Group @relation(fields: [groupId],references: [id])
+  joinedAt DateTime @default(now())
+
+
+  @@unique([userId,groupId])
+  @@map("groupMemberships")
 }
 

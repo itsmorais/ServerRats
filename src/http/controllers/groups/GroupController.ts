@@ -2,6 +2,7 @@ import { JwtRequest, Response } from "express";
 import { createGroupBodySchema } from "../../../validators/groupValidators";
 import { makeCreateGroupUseCase } from "@/use-cases/factories/MakeCreateGroup";
 import logger from "@/utils/logger";
+import { makeGetUserGroupsUseCase } from "@/use-cases/factories/MakeGetUserGroups";
 
 
 export class GroupsController {
@@ -35,6 +36,30 @@ export class GroupsController {
             return res.status(201).json(group);
 
         } catch (err) {
+            return res.status(500).json({ message: "Internal Server Error" });
+        }
+    }
+
+    async list(req: JwtRequest, res: Response) {
+        try {
+            const userId = req.user?.id;
+
+
+            if (!userId) {
+                return res.status(401).json({ message: "Unauthorized" });
+
+            }
+
+            console.log("USER ID:",userId)
+
+            const listUserGroupsUseCase = makeGetUserGroupsUseCase();
+
+            const { groups } = await listUserGroupsUseCase.execute(userId);
+            console.log(`Usuário ${userId} possui ${groups.length} grupo(s).`);
+
+            return res.status(200).json(groups);
+        } catch (error) {
+            logger.error("Erro ao listar grupos do usuário:", error);
             return res.status(500).json({ message: "Internal Server Error" });
         }
     }

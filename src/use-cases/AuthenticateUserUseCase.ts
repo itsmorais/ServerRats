@@ -34,12 +34,8 @@ export class AuthenticateUserUseCase {
         const token = jwt.sign(
             {
                 sub: user.id,
-                role: user.role
             }, env.JWT_SECRET,
-            {
-                expiresIn: "1h",
-
-            });
+        );
 
 
         return { user, token }

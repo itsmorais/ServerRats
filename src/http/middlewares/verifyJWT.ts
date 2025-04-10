@@ -18,7 +18,6 @@ export function authMiddlware(req: JwtRequest, res: Response, next: NextFunction
     try {
         const decoded = jwt.verify(token, env.JWT_SECRET) as DecodedToken
 
-        console.log("DECODED:",decoded)
         req.user = {
             id:decoded.sub
         }

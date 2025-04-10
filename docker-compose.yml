@@ -20,7 +20,7 @@ services:
     env_file:
       - .env 
     environment:
-      - DOCKER: true
+      - DOCKER=true
     volumes:
       - .:/app
       - /app/node_modules

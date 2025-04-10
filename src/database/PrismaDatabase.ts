@@ -20,6 +20,7 @@ export class PrismaDatabase implements IDatabase {
     }
 
     async connect(): Promise<void> {
+        console.log("CONECTADO!")
         await this.client.$connect();
     }
 

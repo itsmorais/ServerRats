@@ -12,13 +12,24 @@ model User {
   name          String
   email         String   @unique
   password_hash String
-  role          Role     @default(MEMBER)
   created_at    DateTime @default(now())
+
+  ownedGroups Group[] @relation("UserOwnsGroups")
 
   @@map("users")
 }
 
-enum Role {
-  ADMIN
-  MEMBER
+model Group {
+  id        Int      @id @default(autoincrement())
+  name      String
+  groupCode String   @unique
+  imageSrc  String
+  isPublic  Boolean  @default(false)
+  owner     User     @relation("UserOwnsGroups", fields: [ownerId], references: [id])
+  ownerId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("groups")
 }
+

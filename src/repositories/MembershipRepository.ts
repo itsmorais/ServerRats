@@ -14,7 +14,20 @@ export class PrismaMembershipRepository implements MembershipRepository {
             where: {
                 userId,
             },
-            include: { group: true }
+            include:
+            {
+                group:
+                {
+                    include:
+                    {
+                        _count:
+                        {
+                            select:
+                                { memberships: true }
+                        }
+                    }
+                }
+            }
         })
 
         return memberships;

@@ -6,6 +6,7 @@ interface CreateGroupRequest {
     name: string;
     imageSrc: string;
     isPublic: boolean;
+    description: string;
     ownerId: string;
     startDate: Date;
     endDate?: Date;
@@ -17,7 +18,7 @@ export class CreateGroupUseCase {
     ) { }
 
 
-    async execute({ name, imageSrc, isPublic, ownerId, startDate, endDate }: CreateGroupRequest) {
+    async execute({ name, imageSrc, isPublic, description, ownerId, startDate, endDate }: CreateGroupRequest) {
         const nanoid = customAlphabet("QPWOEIRUTYALSKDJFHGZMXNCBV0976431285", 8);
         let groupCode = nanoid();
 
@@ -28,6 +29,7 @@ export class CreateGroupUseCase {
 
         const group = await this.groupRepository.create({
             name,
+            description,
             imageSrc,
             isPublic,
             groupCode,

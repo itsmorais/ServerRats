@@ -21,7 +21,7 @@ export class GroupsController {
 
             }
 
-            const { imageSrc, isPublic, name, startDate, endDate } = createGroupBody.data
+            const { imageSrc, isPublic, name,description, startDate, endDate } = createGroupBody.data
 
             const userId = req.user?.id; // JWT middleware
 
@@ -31,7 +31,7 @@ export class GroupsController {
 
             const createGroupUseCase = makeCreateGroupUseCase()
 
-            const { group } = await createGroupUseCase.execute({ name, imageSrc, isPublic, ownerId: userId, startDate, endDate })
+            const { group } = await createGroupUseCase.execute({ name, description,imageSrc, isPublic, ownerId: userId, startDate, endDate })
             logger.info(`Novo grupo registrado:${group.name} - ${group.groupCode}`);
             return res.status(201).json(group);
 

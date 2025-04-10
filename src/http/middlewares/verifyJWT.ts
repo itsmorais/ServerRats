@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken"
 
 interface DecodedToken{
     sub:string;
-    role:string;
 }
 
 export function authMiddlware(req: JwtRequest, res: Response, next: NextFunction) {
@@ -21,8 +20,7 @@ export function authMiddlware(req: JwtRequest, res: Response, next: NextFunction
 
         console.log("DECODED:",decoded)
         req.user = {
-            id:decoded.sub,
-            role:decoded.role
+            id:decoded.sub
         }
 
         next();

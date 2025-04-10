@@ -1,6 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2023", /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    "target": "ES2023",
+    "typeRoots": [
+      "./src/@types",
+      "./node_modules/@types"
+    ],
+    /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     /* Modules */
     "module": "CommonJS", /* Specify what module code is generated. */
     "baseUrl": "./", /* Specify the base directory to resolve non-relative module names. */

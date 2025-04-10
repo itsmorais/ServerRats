@@ -1,8 +1,9 @@
 import { JwtRequest, Response } from "express";
-import { createGroupBodySchema } from "../../../validators/groupValidators";
+import { createGroupBodySchema, joinGroupBodySchema } from "../../../validators/groupValidators";
 import { makeCreateGroupUseCase } from "@/use-cases/factories/MakeCreateGroup";
 import logger from "@/utils/logger";
 import { makeGetUserGroupsUseCase } from "@/use-cases/factories/MakeGetUserGroups";
+import { makeJoinGroupUseCase } from "@/use-cases/factories/MakeJoinGroupUseCase";
 
 
 export class GroupsController {
@@ -21,7 +22,7 @@ export class GroupsController {
 
             }
 
-            const { imageSrc, isPublic, name,description, startDate, endDate } = createGroupBody.data
+            const { imageSrc, isPublic, name, description, startDate, endDate } = createGroupBody.data
 
             const userId = req.user?.id; // JWT middleware
 
@@ -31,7 +32,7 @@ export class GroupsController {
 
             const createGroupUseCase = makeCreateGroupUseCase()
 
-            const { group } = await createGroupUseCase.execute({ name, description,imageSrc, isPublic, ownerId: userId, startDate, endDate })
+            const { group } = await createGroupUseCase.execute({ name, description, imageSrc, isPublic, ownerId: userId, startDate, endDate })
             logger.info(`Novo grupo registrado:${group.name} - ${group.groupCode}`);
             return res.status(201).json(group);
 
@@ -50,7 +51,7 @@ export class GroupsController {
 
             }
 
-            console.log("USER ID:",userId)
+            console.log("USER ID:", userId)
 
             const listUserGroupsUseCase = makeGetUserGroupsUseCase();
 
@@ -62,5 +63,41 @@ export class GroupsController {
             logger.error("Erro ao listar grupos do usuário:", error);
             return res.status(500).json({ message: "Internal Server Error" });
         }
+    }
+
+    async join(req: JwtRequest, res: Response) {
+        try {
+            const userId = req.user?.id;
+
+
+            if (!userId) {
+                return res.status(401).json({ message: "Unauthorized" });
+
+            }
+
+            const parsedBody = joinGroupBodySchema.safeParse(req.body);
+
+            if (!parsedBody.success) {
+                return res.status(400).json({ message: parsedBody.error.message });
+
+            }
+
+            const { groupCode } = parsedBody.data;
+
+            const joinGroupUseCase = makeJoinGroupUseCase();
+            const result = await joinGroupUseCase.execute(userId, groupCode);
+
+            logger.info(`Usuário ${userId} entrou no grupo com código ${groupCode}`);
+            console.log(`Usuário ${userId} entrou no grupo com código ${groupCode}`);
+
+            return res.status(200).json(result);
+
+
+
+        } catch (error) {
+            logger.error("Erro ao entrar no grupo:", error);
+            return res.status(500).json({ message: "Internal Server Error" });
+        }
+
     }
 }

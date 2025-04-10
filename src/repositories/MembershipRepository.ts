@@ -34,6 +34,12 @@ export class PrismaMembershipRepository implements MembershipRepository {
 
     }
 
+    async findByUserIdAndGroupId(userId: string, groupId: number): Promise<GroupMembership | null> {
+        return await this.prisma.groupMembership.findUnique({
+            where: { userId_groupId: { userId, groupId } },
+        });
+
+    }
 
 
 }

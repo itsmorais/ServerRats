@@ -4,6 +4,7 @@ import { makeCreateGroupUseCase } from "@/use-cases/factories/MakeCreateGroup";
 import logger from "@/utils/logger";
 import { makeGetUserGroupsUseCase } from "@/use-cases/factories/MakeGetUserGroups";
 import { makeJoinGroupUseCase } from "@/use-cases/factories/MakeJoinGroupUseCase";
+import { UserAlreadyInGroupError } from "@/use-cases/errors/UserAlreadyInGroupError";
 
 
 export class GroupsController {
@@ -95,6 +96,12 @@ export class GroupsController {
 
 
         } catch (error) {
+            if (error instanceof UserAlreadyInGroupError) {
+                logger.error("Erro ao entrar no grupo:", error);
+                return res.status(400).json({ message: error.message });
+
+
+            }
             logger.error("Erro ao entrar no grupo:", error);
             return res.status(500).json({ message: "Internal Server Error" });
         }

@@ -8,47 +8,74 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  name          String
-  email         String   @unique
-  password_hash String
-  created_at    DateTime @default(now())
+  id                String            @id @default(uuid())
+  name              String
+  email             String            @unique
+  password_hash     String
+  created_at        DateTime          @default(now())
   groupsMemberships GroupMembership[]
 
-
-  ownedGroups Group[] @relation("UserOwnsGroups")
+  StudyLog    StudyLog[]
+  ownedGroups Group[]    @relation("UserOwnsGroups")
 
   @@map("users")
 }
 
 model Group {
-  id        Int      @id @default(autoincrement())
-  name      String
-  description String
-  groupCode String   @unique
-  imageSrc  String
-  isPublic  Boolean  @default(false)
-  owner     User     @relation("UserOwnsGroups", fields: [ownerId], references: [id])
-  ownerId   String
-  memberships GroupMembership[]
-  startDate DateTime
-  endDate   DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int               @id @default(autoincrement())
+  name          String
+  description   String
+  groupCode     String            @unique
+  imageSrc      String
+  isPublic      Boolean           @default(false)
+  owner         User              @relation("UserOwnsGroups", fields: [ownerId], references: [id])
+  ownerId       String
+  memberships   GroupMembership[]
+  startDate     DateTime
+  endDate       DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  StudyLogGroup StudyLogGroup[]
 
   @@map("groups")
 }
 
-model GroupMembership{
-  id  Int @id @default(autoincrement())
-  userId  String
-  groupId Int
-  user  User @relation(fields: [userId],references: [id])
-  group Group @relation(fields: [groupId],references: [id])
+model GroupMembership {
+  id       Int      @id @default(autoincrement())
+  userId   String
+  groupId  Int
+  user     User     @relation(fields: [userId], references: [id])
+  group    Group    @relation(fields: [groupId], references: [id])
   joinedAt DateTime @default(now())
 
-
-  @@unique([userId,groupId])
+  @@unique([userId, groupId])
   @@map("groupMemberships")
 }
 
+model StudyLog {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  note      String?
+  imageUrl  String
+  studiedAt DateTime
+  createdAt DateTime @default(now())
+
+  user   User            @relation(fields: [userId], references: [id])
+  groups StudyLogGroup[]
+
+    @@map("studyLogs")
+
+}
+
+model StudyLogGroup {
+  id         Int    @id @default(autoincrement())
+  studyLogId String
+  groupId    Int
+
+  studyLog StudyLog @relation(fields: [studyLogId], references: [id])
+  group    Group    @relation(fields: [groupId], references: [id])
+
+  @@unique([studyLogId, groupId])
+  @@map("studyLogGroups")
+}

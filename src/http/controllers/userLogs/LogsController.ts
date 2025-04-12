@@ -2,6 +2,7 @@ import { JwtRequest, Response } from "express";
 import logger from "@/utils/logger";
 import { bodySchema } from "../../../validators/logsValidators";
 import { makeCreateStudyLog } from "@/use-cases/factories/MakeCreateStudyLog";
+import { makeGetGroupLogUseCase } from "@/use-cases/factories/MakeGetGroupLog";
 
 
 export class LogController {
@@ -18,7 +19,6 @@ export class LogController {
 
             if (!parsed.success) {
                 return res.status(400).json({ message: parsed.error.message });
-
             }
 
             const { title, note, imageUrl, studiedAt, groupIds } = parsed.data;
@@ -38,6 +38,37 @@ export class LogController {
             return res.status(201).json(log);
 
         } catch (err) {
+            return res.status(500).json({ message: "Internal Server Error" });
+
+        }
+    }
+
+
+    async list(req: JwtRequest, res: Response) {
+        try {
+
+            const userId = req.user?.id;
+            if (!userId) {
+                return res.status(401).json({ message: "Unauthorized" });
+            }
+
+            const groupId = Number(req.params.id);
+
+            if (isNaN(groupId)) {
+                return res.status(400).json({ message: "Invalid group ID" });
+
+            }
+
+            const getGroupsLogs = makeGetGroupLogUseCase();
+
+            const { logs } = await getGroupsLogs.execute({ groupId });
+
+
+            logger.info(`Logs listados para o grupo ${groupId}`);
+            return res.status(200).json(logs);
+
+        } catch (err) {
+            logger.error("Erro ao buscar logs do grupo:", err);
             return res.status(500).json({ message: "Internal Server Error" });
 
         }

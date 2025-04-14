@@ -9,11 +9,11 @@ export class UserController {
 
     async create(req: Request, res: Response) {
         try {
-            const { name, email, password, role } = registerBodySchema.parse(req.body);
+            const { name, email, password, avatarUrl } = registerBodySchema.parse(req.body);
 
             const createUserUseCase = makeCreateUserUseCase()
 
-            const user = await createUserUseCase.execute({ name, email, password, role });
+            const user = await createUserUseCase.execute({ name, email, password, avatarUrl });
             logger.info(`Novo usuário registrado:${email}`)
             return res.status(201).json(user);
         } catch (err) {

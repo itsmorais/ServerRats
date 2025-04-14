@@ -4,5 +4,5 @@ export const registerBodySchema = z.object({
     name: z.string(),
     email: z.string().email(),
     password: z.string().min(6),
-    role: z.enum(["MEMBER", "ADMIN"]).default("MEMBER")
+    avatarUrl: z.string().url()
 });

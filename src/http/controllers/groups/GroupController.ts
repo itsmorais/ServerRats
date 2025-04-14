@@ -1,10 +1,11 @@
 import { JwtRequest, Response } from "express";
-import { createGroupBodySchema, joinGroupBodySchema } from "../../../validators/groupValidators";
+import { createGroupBodySchema, joinGroupBodySchema, leaderboardParamsSchema, leaderBoardQuerySchema } from "../../../validators/groupValidators";
 import { makeCreateGroupUseCase } from "@/use-cases/factories/MakeCreateGroup";
 import logger from "@/utils/logger";
 import { makeGetUserGroupsUseCase } from "@/use-cases/factories/MakeGetUserGroups";
 import { makeJoinGroupUseCase } from "@/use-cases/factories/MakeJoinGroupUseCase";
 import { UserAlreadyInGroupError } from "@/use-cases/errors/UserAlreadyInGroupError";
+import { makeGetLeaderboard } from "@/use-cases/factories/MakeGetLeaderboard";
 
 
 export class GroupsController {
@@ -106,5 +107,46 @@ export class GroupsController {
             return res.status(500).json({ message: "Internal Server Error" });
         }
 
+    }
+
+    async leaderBoard(req: JwtRequest, res: Response) {
+        try {
+            const userId = req.user?.id;
+
+
+            if (!userId) {
+                return res.status(401).json({ message: "Unauthorized" });
+
+            }
+
+            const parsedParams = leaderboardParamsSchema.safeParse(req.params);
+            const parsedQuery = leaderBoardQuerySchema.safeParse(req.query);
+
+            if (!parsedParams.success || !parsedQuery.success) {
+                const errors = {
+                    ...(parsedParams.error?.format?.() ?? {}),
+                    ...(parsedQuery.error?.format?.() ?? {}),
+                };
+
+                return res.status(400).json({ message: "Invalid input", errors });
+            }
+
+            const groupId = parsedParams.data.groupId;
+            const range = parsedQuery.data.range;
+
+
+            const getLeaderboardUseCase = makeGetLeaderboard();
+
+            const leaderboard = await getLeaderboardUseCase.execute({ groupId, range });
+
+            //logger.info(`Usuário ${userId} entrou no grupo com código ${groupCode}`);
+            console.log(`Usuário ${userId} visualizou leaderboard do grupo ${groupId} (${range})`);
+
+            return res.status(200).json(leaderboard);
+
+        } catch (error) {
+            logger.error("Erro ao listar grupos do usuário:", error);
+            return res.status(500).json({ message: "Internal Server Error" });
+        }
     }
 }

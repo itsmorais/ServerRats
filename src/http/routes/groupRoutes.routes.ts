@@ -1,4 +1,4 @@
-import {  Router } from "express";
+import { Router } from "express";
 import { authMiddlware } from "../middlewares/verifyJWT";
 import { GroupsController } from "../controllers/groups/GroupController";
 
@@ -6,7 +6,8 @@ export const groupRoutes = Router();
 
 const groupController = new GroupsController()
 
-groupRoutes.post("/create", authMiddlware,groupController.create);
-groupRoutes.get("/list", authMiddlware,groupController.list);
-groupRoutes.post("/join",authMiddlware,groupController.join)
+groupRoutes.post("/create", authMiddlware, groupController.create);
+groupRoutes.get("/list", authMiddlware, groupController.list);
+groupRoutes.post("/join", authMiddlware, groupController.join)
+groupRoutes.get("/:groupId/leaderboard", authMiddlware, groupController.leaderBoard);
 

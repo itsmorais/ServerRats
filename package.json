@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node build/server.js",
-    "build": "tsup src --out-dir build --format esm --target es2022",
+  "build": "tsup src/server.ts --out-dir build --format esm --target es2022",
+  "start": "node --enable-source-maps build/server.mjs",
+
     "start:dev": "tsx watch src/server.ts",
     "postinstall": "npm run build && prisma generate && prisma migrate deploy",
     "test": "vitest",

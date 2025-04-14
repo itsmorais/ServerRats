@@ -1,6 +1,7 @@
 import { User } from "@prisma/client"
 import { UserRepository } from "@/repositories/UserRepository";
-import { compare } from "bcryptjs";
+import bcrypt from "bcryptjs";
+
 import { InvalidCredentialsError } from "./errors/InvalidCredentialsError";
 import jwt from "jsonwebtoken";
 import { env } from "@/env";
@@ -16,6 +17,8 @@ interface AuthenticateUserUseCaseResponse {
     token: string
 }
 
+const compare = bcrypt.compare;
+const hash = bcrypt.hash;
 export class AuthenticateUserUseCase {
     constructor(private usersRepository: UserRepository) { }
 

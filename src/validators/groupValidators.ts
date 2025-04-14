@@ -23,3 +23,9 @@ export const leaderboardParamsSchema = z.object({
     message: "groupId must be a valid number",
   }),
 });
+
+export const groupDetailParamsSchema = z.object({
+  groupId: z.string().refine((val) => !isNaN(Number(val)), {
+    message: "groupId must be a valid number",
+  }),
+});

@@ -1,11 +1,12 @@
 import { JwtRequest, Response } from "express";
-import { createGroupBodySchema, joinGroupBodySchema, leaderboardParamsSchema, leaderBoardQuerySchema } from "../../../validators/groupValidators";
+import { createGroupBodySchema, groupDetailParamsSchema, joinGroupBodySchema, leaderboardParamsSchema, leaderBoardQuerySchema } from "../../../validators/groupValidators";
 import { makeCreateGroupUseCase } from "@/use-cases/factories/MakeCreateGroup";
 import logger from "@/utils/logger";
 import { makeGetUserGroupsUseCase } from "@/use-cases/factories/MakeGetUserGroups";
 import { makeJoinGroupUseCase } from "@/use-cases/factories/MakeJoinGroupUseCase";
 import { UserAlreadyInGroupError } from "@/use-cases/errors/UserAlreadyInGroupError";
 import { makeGetLeaderboard } from "@/use-cases/factories/MakeGetLeaderboard";
+import { makeGetGroupDetail } from "@/use-cases/factories/MakeGetGroupDetail";
 
 
 export class GroupsController {
@@ -148,5 +149,33 @@ export class GroupsController {
             logger.error("Erro ao listar grupos do usuário:", error);
             return res.status(500).json({ message: "Internal Server Error" });
         }
+    }
+
+    async detail(req: JwtRequest, res: Response) {
+        try {
+            const userId = req.user?.id;
+            if (!userId) {
+                return res.status(401).json({ message: "Unauthorized" });
+            }
+
+            const parsedParams = groupDetailParamsSchema.safeParse(req.params);
+            if (!parsedParams.success) {
+                return res.status(400).json({ message: "Invalid input", error: parsedParams.error.format() });
+            }
+
+            const groupId = parsedParams.data.groupId;
+
+            const useCase = makeGetGroupDetail();
+            const detail = await useCase.execute({ groupId });
+
+            logger.info(`Usuário ${userId} visualizou o detalhe do grupo ${groupId}`);
+
+            return res.status(200).json(detail);
+        } catch (error) {
+            logger.error("Erro ao buscar detalhes do grupo:", error);
+            return res.status(500).json({ message: "Erro interno ao buscar detalhes do grupo" });
+        }
+
+
     }
 }

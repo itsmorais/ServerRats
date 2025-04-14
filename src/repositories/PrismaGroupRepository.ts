@@ -1,6 +1,7 @@
 import { Prisma, Group } from "@prisma/client";
 import { PrismaDatabase } from "@/database/PrismaDatabase";
-import { GroupsRepository, LeaderboardEntry } from "./GroupRepository";
+import { GroupMemberEntry, GroupsRepository, LeaderboardEntry } from "./GroupRepository";
+import { GroupWithOwner } from "./DTOS/GroupWithOwner";
 
 export class PrismaGroupsRepository implements GroupsRepository {
 
@@ -19,11 +20,12 @@ export class PrismaGroupsRepository implements GroupsRepository {
         });
     }
 
-    findById(id: number): Promise<Group | null> {
+    findById(id: number): Promise<GroupWithOwner | null> {
         return this.prisma.group.findUnique({
             where: {
                 id: id
-            }
+            },
+            include: { owner: { select: { id: true, name: true } } }
         })
     };
 
@@ -64,5 +66,27 @@ export class PrismaGroupsRepository implements GroupsRepository {
             studiedAt: slg.studyLog.studiedAt,
         }));
     }
+
+    async getGroupMembers(groupId: number): Promise<GroupMemberEntry[]> {
+        const memberships = await this.prisma.groupMembership.findMany({
+            where: { groupId },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avatarUrl: true,
+                    }
+                }
+            }
+        });
+
+        return memberships.map(m => ({
+            id: m.user.id,
+            name: m.user.name,
+            avatarUrl: m.user.avatarUrl,
+        }));
+    }
+
 }
 

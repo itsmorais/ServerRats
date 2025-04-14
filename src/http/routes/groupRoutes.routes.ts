@@ -10,4 +10,4 @@ groupRoutes.post("/create", authMiddlware, groupController.create);
 groupRoutes.get("/list", authMiddlware, groupController.list);
 groupRoutes.post("/join", authMiddlware, groupController.join)
 groupRoutes.get("/:groupId/leaderboard", authMiddlware, groupController.leaderBoard);
-
+groupRoutes.get("/:groupId/detail", authMiddlware, groupController.detail);
